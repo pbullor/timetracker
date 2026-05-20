@@ -1,0 +1,54 @@
+import { db } from "@/db";
+import { projects } from "@/db/schema";
+import { getUserFromRequest } from "@/lib/auth";
+import { updateProjectSchema } from "@/lib/validators";
+import { and, eq } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
+
+type Params = { params: Promise<{ id: string }> };
+
+export async function PATCH(request: NextRequest, { params }: Params) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return NextResponse.json({ error: "X-User-Email header required" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const body = await request.json();
+  const parsed = updateProjectSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+  }
+
+  const updated = await db
+    .update(projects)
+    .set(parsed.data)
+    .where(and(eq(projects.id, id), eq(projects.userId, user.id)))
+    .returning();
+
+  if (updated.length === 0) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(updated[0]);
+}
+
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return NextResponse.json({ error: "X-User-Email header required" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const updated = await db
+    .update(projects)
+    .set({ archived: true })
+    .where(and(eq(projects.id, id), eq(projects.userId, user.id)))
+    .returning();
+
+  if (updated.length === 0) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(updated[0]);
+}
