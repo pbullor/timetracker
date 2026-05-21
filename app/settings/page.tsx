@@ -218,7 +218,7 @@ function HookInstructions() {
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
-          After generating your API key, run the installer from the TimeTracker repo:
+          After generating your API key, run the installer from the Multick repo:
         </p>
         <pre className="rounded-lg bg-muted p-3 text-sm font-mono overflow-x-auto">
           bash hooks/install.sh

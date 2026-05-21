@@ -6,7 +6,7 @@ export function PublicHeader() {
     <header className="border-b border-border/50">
       <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-14">
         <Link href="/" className="font-semibold text-lg tracking-tight">
-          TimeTracker
+          Multick
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/login">

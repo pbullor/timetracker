@@ -100,7 +100,7 @@ export default function ReportsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `timetracker-${period}-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.download = `multick-${period}-${format(new Date(), "yyyy-MM-dd")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

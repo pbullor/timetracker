@@ -26,7 +26,7 @@ const t = {
       title: "Know exactly where your dev time goes.",
       titleAccent: "And how much AI saves you.",
       subtitle:
-        "TimeTracker automatically logs your Claude Code sessions alongside manual timers. See real hours vs AI-assisted hours per project — the metric that matters.",
+        "Multick automatically logs your Claude Code sessions alongside manual timers. See real hours vs AI-assisted hours per project — the metric that matters.",
       cta: "Start Free Trial",
       ctaSecondary: "See how it works",
     },
@@ -123,7 +123,7 @@ const t = {
       title: "Sabe exactamente a donde va tu tiempo de desarrollo.",
       titleAccent: "Y cuanto te ahorra la IA.",
       subtitle:
-        "TimeTracker loguea tus sesiones de Claude Code automaticamente junto con timers manuales. Ve horas reales vs horas asistidas por IA por proyecto — la metrica que importa.",
+        "Multick loguea tus sesiones de Claude Code automaticamente junto con timers manuales. Ve horas reales vs horas asistidas por IA por proyecto — la metrica que importa.",
       cta: "Probar Gratis 7 Dias",
       ctaSecondary: "Ver como funciona",
     },
@@ -225,7 +225,7 @@ export function Landing() {
       {/* Nav */}
       <header className="border-b border-border/50">
         <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-14">
-          <span className="font-semibold text-lg tracking-tight">TimeTracker</span>
+          <span className="font-semibold text-lg tracking-tight">Multick</span>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setLang(lang === "en" ? "es" : "en")}

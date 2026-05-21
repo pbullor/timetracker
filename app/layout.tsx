@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TimeTracker — Dev Time Tracking",
-  description: "Track your development time with AI-assisted insights. Measure manual hours vs AI-assisted hours per project.",
+  title: "Multick — AI Dev Time Tracking",
+  description: "Track your development time with AI-assisted insights. Measure manual hours vs AI-assisted hours per project. Know exactly where your dev time goes.",
 };
 
 export default async function RootLayout({

@@ -11,7 +11,7 @@ export default async function LoginPage() {
     <div className="flex items-center justify-center min-h-[60vh]">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">TimeTracker</CardTitle>
+          <CardTitle className="text-2xl">Multick</CardTitle>
           <p className="text-sm text-muted-foreground">
             Sign in to track your development time
           </p>
