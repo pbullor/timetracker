@@ -2,13 +2,13 @@ const API_BASE = "";
 
 function getHeaders(): Record<string, string> {
   const email = typeof window !== "undefined" ? localStorage.getItem("tt-user-email") : null;
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  if (email) {
-    headers["X-User-Email"] = email;
+  if (!email) {
+    throw new Error("Email not set. Enter your email in the top-right corner first.");
   }
-  return headers;
+  return {
+    "Content-Type": "application/json",
+    "X-User-Email": email,
+  };
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {

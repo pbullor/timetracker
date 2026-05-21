@@ -48,27 +48,41 @@ export function Navbar() {
 
 function EmailSetter() {
   const [email, setEmail] = useState("");
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     setEmail(localStorage.getItem("tt-user-email") ?? "");
+    setSaved(!!localStorage.getItem("tt-user-email"));
   }, []);
+
+  function handleSave() {
+    if (email.includes("@")) {
+      localStorage.setItem("tt-user-email", email);
+      setSaved(true);
+    }
+  }
 
   return (
     <div className="flex items-center gap-2">
       <input
         type="email"
         placeholder="your@email.com"
-        className="h-8 w-52 rounded-md border border-input bg-background px-2 text-sm"
+        className={cn(
+          "h-8 w-52 rounded-md border bg-background px-2 text-sm",
+          saved ? "border-emerald-500/50" : "border-input"
+        )}
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
-          if (e.target.value.includes("@")) {
-            localStorage.setItem("tt-user-email", e.target.value);
-          }
+          setSaved(false);
         }}
+        onBlur={handleSave}
+        onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
       />
-      {!email.includes("@") && (
-        <span className="text-xs text-destructive">Set email to start</span>
+      {saved ? (
+        <span className="text-xs text-emerald-500">Connected</span>
+      ) : (
+        <span className="text-xs text-destructive">Enter email + press Enter</span>
       )}
     </div>
   );
