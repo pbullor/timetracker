@@ -4,16 +4,110 @@ import { useState } from "react";
 import { useApi } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Copy, RefreshCw, Trash2, Eye, EyeOff } from "lucide-react";
+import { Copy, RefreshCw, Trash2, Eye, EyeOff, CreditCard, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Settings</h1>
+      <BillingSection />
       <ApiKeySection />
       <HookInstructions />
     </div>
+  );
+}
+
+const PLAN_LABELS: Record<string, { label: string; color: string }> = {
+  free: { label: "Free", color: "bg-muted text-muted-foreground" },
+  starter: { label: "Starter", color: "bg-blue-500/10 text-blue-500" },
+  pro: { label: "Pro", color: "bg-purple-500/10 text-purple-500" },
+  team: { label: "Team", color: "bg-emerald-500/10 text-emerald-500" },
+};
+
+function BillingSection() {
+  const { data, loading } = useApi<{
+    plan: string;
+    stripeCustomerId: string | null;
+    stripeSubscriptionId: string | null;
+    planExpiresAt: string | null;
+  }>(() => fetch("/api/settings/billing").then((r) => r.json()), []);
+
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  async function openPortal() {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const json = await res.json();
+      if (json.url) window.location.href = json.url;
+    } finally {
+      setPortalLoading(false);
+    }
+  }
+
+  const plan = data?.plan ?? "free";
+  const planInfo = PLAN_LABELS[plan] ?? PLAN_LABELS.free;
+  const hasSubscription = !!data?.stripeSubscriptionId;
+  const expiresAt = data?.planExpiresAt ? new Date(data.planExpiresAt) : null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <CreditCard className="h-4 w-4" />
+          Plan & Billing
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {loading ? (
+          <div className="h-16 flex items-center text-sm text-muted-foreground">Loading...</div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Current plan</span>
+                  <Badge variant="secondary" className={planInfo.color}>
+                    {planInfo.label}
+                  </Badge>
+                </div>
+                {hasSubscription && expiresAt && (
+                  <p className="text-xs text-muted-foreground">
+                    Renews {expiresAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </p>
+                )}
+                {!hasSubscription && (
+                  <p className="text-xs text-muted-foreground">
+                    No active subscription
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/pricing">
+                <Button variant="outline" size="sm">
+                  {hasSubscription ? "Change plan" : "Choose a plan"}
+                  <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              </Link>
+              {hasSubscription && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openPortal}
+                  disabled={portalLoading}
+                >
+                  {portalLoading ? "Loading..." : "Manage billing"}
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
