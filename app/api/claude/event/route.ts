@@ -1,25 +1,23 @@
 import { db } from "@/db";
-import { claudeSessions, claudeEvents, projects, timeEntries } from "@/db/schema";
-import { upsertUser } from "@/lib/auth";
+import { claudeSessions, claudeEvents, projectMembers, projects, timeEntries } from "@/db/schema";
+import { getUserByApiKey } from "@/lib/auth";
 import { claudeEventSchema } from "@/lib/validators";
-import { and, eq, like } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 const IDLE_THRESHOLD_MS = 5 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get("x-api-key");
-  const expectedKey = process.env.CLAUDE_HOOK_API_KEY;
-  if (!expectedKey || apiKey !== expectedKey) {
+  if (!apiKey) {
+    return NextResponse.json({ error: "X-Api-Key header required" }, { status: 401 });
+  }
+
+  const user = await getUserByApiKey(apiKey);
+  if (!user) {
     return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
   }
 
-  const userEmail = process.env.CLAUDE_HOOK_USER_EMAIL;
-  if (!userEmail) {
-    return NextResponse.json({ error: "CLAUDE_HOOK_USER_EMAIL not configured" }, { status: 500 });
-  }
-
-  const user = await upsertUser(userEmail);
   const body = await request.json();
   const parsed = claudeEventSchema.safeParse(body);
   if (!parsed.success) {
@@ -121,14 +119,20 @@ export async function POST(request: NextRequest) {
 }
 
 async function findProjectByCwd(userId: string, cwd: string) {
-  const userProjects = await db
-    .select()
-    .from(projects)
-    .where(and(eq(projects.userId, userId), eq(projects.archived, false)));
+  const memberships = await db
+    .select({
+      projectId: projectMembers.projectId,
+      cwdPattern: projectMembers.cwdPattern,
+      projectName: projects.name,
+      projectArchived: projects.archived,
+    })
+    .from(projectMembers)
+    .innerJoin(projects, eq(projectMembers.projectId, projects.id))
+    .where(eq(projectMembers.userId, userId));
 
-  for (const project of userProjects) {
-    if (project.cwdPattern && cwd.startsWith(project.cwdPattern)) {
-      return project;
+  for (const m of memberships) {
+    if (m.cwdPattern && !m.projectArchived && cwd.startsWith(m.cwdPattern)) {
+      return { id: m.projectId, name: m.projectName };
     }
   }
   return null;

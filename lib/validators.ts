@@ -13,7 +13,6 @@ export const updateProjectSchema = z.object({
   client: z.string().nullable().optional(),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
   hourlyRate: z.string().nullable().optional(),
-  cwdPattern: z.string().nullable().optional(),
   archived: z.boolean().optional(),
 });
 

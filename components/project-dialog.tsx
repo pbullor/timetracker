@@ -84,7 +84,7 @@ export function ProjectDialog({ project, trigger, onSave }: ProjectDialogProps) 
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cwdPattern">CWD Pattern</Label>
+            <Label htmlFor="cwdPattern">Your CWD Pattern</Label>
             <Input
               id="cwdPattern"
               name="cwdPattern"
@@ -92,7 +92,7 @@ export function ProjectDialog({ project, trigger, onSave }: ProjectDialogProps) 
               defaultValue={project?.cwdPattern ?? ""}
             />
             <p className="text-xs text-muted-foreground">
-              Directory prefix to auto-match Claude Code sessions to this project
+              Your local directory for this project. Each team member sets their own.
             </p>
           </div>
           {error && (

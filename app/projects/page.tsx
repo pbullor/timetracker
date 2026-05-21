@@ -3,6 +3,7 @@
 import { api } from "@/lib/api-client";
 import { useApi } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -12,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ProjectDialog } from "@/components/project-dialog";
+import { MembersDialog } from "@/components/members-dialog";
 import { Plus, Pencil, Archive } from "lucide-react";
 import type { ProjectResponse, CreateProject } from "@/lib/api-client";
 
@@ -57,15 +59,16 @@ export default function ProjectsPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Client</TableHead>
-              <TableHead>CWD Pattern</TableHead>
+              <TableHead>Your CWD</TableHead>
               <TableHead>Rate</TableHead>
-              <TableHead className="w-24">Actions</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead className="w-28">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {(!projects || projects.length === 0) ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                   No projects yet. Create your first one.
                 </TableCell>
               </TableRow>
@@ -91,24 +94,38 @@ export default function ProjectsPage() {
                     {project.hourlyRate ? `$${project.hourlyRate}/h` : "—"}
                   </TableCell>
                   <TableCell>
+                    <Badge variant="outline" className="text-xs">
+                      {project.role || "owner"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     <div className="flex gap-1">
-                      <ProjectDialog
-                        project={project}
-                        trigger={
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                        }
-                        onSave={(data) => handleUpdate(project.id, data)}
+                      <MembersDialog
+                        projectId={project.id}
+                        projectName={project.name}
+                        isOwner={project.role === "owner" || !project.role}
                       />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => handleArchive(project.id)}
-                      >
-                        <Archive className="h-3.5 w-3.5" />
-                      </Button>
+                      {(project.role === "owner" || !project.role) && (
+                        <>
+                          <ProjectDialog
+                            project={project}
+                            trigger={
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                            }
+                            onSave={(data) => handleUpdate(project.id, data)}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => handleArchive(project.id)}
+                          >
+                            <Archive className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

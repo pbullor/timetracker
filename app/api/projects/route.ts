@@ -1,49 +1,79 @@
 import { db } from "@/db";
-import { projects } from "@/db/schema";
-import { getUserFromRequest } from "@/lib/auth";
-import { createProjectSchema } from "@/lib/validators";
-import { and, eq } from "drizzle-orm";
+import { projects, projectMembers } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
+import { and, eq, or } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { createProjectSchema } from "@/lib/validators";
 
-export async function GET(request: NextRequest) {
-  const user = await getUserFromRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: "X-User-Email header required" }, { status: 401 });
+export async function GET() {
+  try {
+    const user = await requireUser();
+
+    const owned = await db
+      .select()
+      .from(projects)
+      .where(and(eq(projects.ownerId, user.id), eq(projects.archived, false)))
+      .orderBy(projects.name);
+
+    const memberOf = await db
+      .select({
+        id: projects.id,
+        ownerId: projects.ownerId,
+        name: projects.name,
+        client: projects.client,
+        color: projects.color,
+        hourlyRate: projects.hourlyRate,
+        archived: projects.archived,
+        createdAt: projects.createdAt,
+        cwdPattern: projectMembers.cwdPattern,
+        role: projectMembers.role,
+      })
+      .from(projectMembers)
+      .innerJoin(projects, eq(projectMembers.projectId, projects.id))
+      .where(and(eq(projectMembers.userId, user.id), eq(projects.archived, false)));
+
+    const ownedIds = new Set(owned.map((p) => p.id));
+    const merged = [
+      ...owned.map((p) => ({ ...p, role: "owner" as const, cwdPattern: null as string | null })),
+      ...memberOf.filter((p) => !ownedIds.has(p.id)),
+    ];
+
+    return NextResponse.json(merged);
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const rows = await db
-    .select()
-    .from(projects)
-    .where(and(eq(projects.userId, user.id), eq(projects.archived, false)))
-    .orderBy(projects.name);
-
-  return NextResponse.json(rows);
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getUserFromRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: "X-User-Email header required" }, { status: 401 });
-  }
+  try {
+    const user = await requireUser();
+    const body = await request.json();
+    const parsed = createProjectSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
 
-  const body = await request.json();
-  const parsed = createProjectSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
-  }
+    const data = parsed.data;
+    const inserted = await db
+      .insert(projects)
+      .values({
+        ownerId: user.id,
+        name: data.name,
+        client: data.client ?? null,
+        color: data.color ?? "#3b82f6",
+        hourlyRate: data.hourlyRate ?? null,
+      })
+      .returning();
 
-  const data = parsed.data;
-  const inserted = await db
-    .insert(projects)
-    .values({
+    await db.insert(projectMembers).values({
+      projectId: inserted[0].id,
       userId: user.id,
-      name: data.name,
-      client: data.client ?? null,
-      color: data.color ?? "#3b82f6",
-      hourlyRate: data.hourlyRate ?? null,
+      role: "owner",
       cwdPattern: data.cwdPattern ?? null,
-    })
-    .returning();
+    });
 
-  return NextResponse.json(inserted[0], { status: 201 });
+    return NextResponse.json(inserted[0], { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 }

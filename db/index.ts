@@ -4,7 +4,7 @@ import * as schema from "./schema";
 
 let _db: NeonHttpDatabase<typeof schema> | null = null;
 
-function getDb() {
+export function getDb() {
   if (_db) return _db;
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {

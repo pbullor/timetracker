@@ -1,21 +1,8 @@
-const API_BASE = "";
-
-function getHeaders(): Record<string, string> {
-  const email = typeof window !== "undefined" ? localStorage.getItem("tt-user-email") : null;
-  if (!email) {
-    throw new Error("Email not set. Enter your email in the top-right corner first.");
-  }
-  return {
-    "Content-Type": "application/json",
-    "X-User-Email": email,
-  };
-}
-
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(path, {
     ...options,
     headers: {
-      ...getHeaders(),
+      "Content-Type": "application/json",
       ...options?.headers,
     },
   });
@@ -57,6 +44,7 @@ export interface ProjectResponse {
   cwdPattern: string | null;
   archived: boolean;
   createdAt: string;
+  role?: string;
   totalSeconds?: number;
 }
 

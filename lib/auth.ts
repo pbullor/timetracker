@@ -1,21 +1,33 @@
+import { auth } from "@/lib/auth-config";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 
-export async function getUserFromRequest(request: NextRequest) {
-  const email = request.headers.get("x-user-email");
-  if (!email) {
-    return null;
-  }
-  return upsertUser(email);
+export async function getSessionUser() {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const rows = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  return rows[0] ?? null;
 }
 
-export async function upsertUser(email: string) {
-  const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
-  if (existing.length > 0) {
-    return existing[0];
-  }
-  const inserted = await db.insert(users).values({ email }).returning();
-  return inserted[0];
+export async function requireUser() {
+  const user = await getSessionUser();
+  if (!user) throw new Error("Unauthorized");
+  return user;
+}
+
+export async function getUserByApiKey(apiKey: string) {
+  const rows = await db
+    .select()
+    .from(users)
+    .where(eq(users.apiKey, apiKey))
+    .limit(1);
+
+  return rows[0] ?? null;
 }
