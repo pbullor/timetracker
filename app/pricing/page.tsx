@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -107,9 +106,9 @@ export default function PricingPage() {
               }
             >
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
                   Most Popular
-                </Badge>
+                </span>
               )}
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">{plan.name}</CardTitle>
