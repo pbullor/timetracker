@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export default auth((req) => {
   const publicPaths = ["/", "/login"];
-  if (!req.auth && !publicPaths.includes(req.nextUrl.pathname)) {
+  if (!req.auth?.user && !publicPaths.includes(req.nextUrl.pathname)) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
     return NextResponse.redirect(loginUrl);
   }

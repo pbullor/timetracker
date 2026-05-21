@@ -19,14 +19,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    // Auth not configured yet
+  }
 
   return (
     <html lang="en" className={`${inter.variable} dark h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
-        {session ? (
+        {session?.user ? (
           <>
-            <Navbar userName={session.user?.name} userImage={session.user?.image} />
+            <Navbar userName={session.user.name} userImage={session.user.image} />
             <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-8">
               {children}
             </main>
