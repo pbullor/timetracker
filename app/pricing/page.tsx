@@ -101,7 +101,7 @@ export default function PricingPage() {
               key={plan.key}
               className={
                 plan.popular
-                  ? "border-2 border-primary relative"
+                  ? "border-2 border-primary relative overflow-visible"
                   : "border-border/50"
               }
             >
