@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Clock, FolderOpen, BarChart3 } from "lucide-react";
@@ -46,19 +47,29 @@ export function Navbar() {
 }
 
 function EmailSetter() {
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    setEmail(localStorage.getItem("tt-user-email") ?? "");
+  }, []);
+
   return (
     <div className="flex items-center gap-2">
       <input
         type="email"
         placeholder="your@email.com"
         className="h-8 w-52 rounded-md border border-input bg-background px-2 text-sm"
-        defaultValue={typeof window !== "undefined" ? localStorage.getItem("tt-user-email") ?? "" : ""}
+        value={email}
         onChange={(e) => {
+          setEmail(e.target.value);
           if (e.target.value.includes("@")) {
             localStorage.setItem("tt-user-email", e.target.value);
           }
         }}
       />
+      {!email.includes("@") && (
+        <span className="text-xs text-destructive">Set email to start</span>
+      )}
     </div>
   );
 }

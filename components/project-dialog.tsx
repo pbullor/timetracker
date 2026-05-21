@@ -22,20 +22,27 @@ interface ProjectDialogProps {
 export function ProjectDialog({ project, trigger, onSave }: ProjectDialogProps) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSaving(true);
-    const form = new FormData(e.currentTarget);
-    await onSave({
-      name: form.get("name") as string,
-      client: (form.get("client") as string) || null,
-      color: (form.get("color") as string) || "#3b82f6",
-      hourlyRate: (form.get("hourlyRate") as string) || null,
-      cwdPattern: (form.get("cwdPattern") as string) || null,
-    });
-    setSaving(false);
-    setOpen(false);
+    setError(null);
+    try {
+      const form = new FormData(e.currentTarget);
+      await onSave({
+        name: form.get("name") as string,
+        client: (form.get("client") as string) || null,
+        color: (form.get("color") as string) || "#3b82f6",
+        hourlyRate: (form.get("hourlyRate") as string) || null,
+        cwdPattern: (form.get("cwdPattern") as string) || null,
+      });
+      setOpen(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -88,6 +95,9 @@ export function ProjectDialog({ project, trigger, onSave }: ProjectDialogProps) 
               Directory prefix to auto-match Claude Code sessions to this project
             </p>
           </div>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
