@@ -106,4 +106,5 @@ export interface StatsSummary {
   totalSeconds: number;
   byProject: { projectId: string; projectName: string; projectColor: string; totalSeconds: number }[];
   bySource: { manual: number; claude_code: number };
+  aiWorkingSeconds: number;
 }

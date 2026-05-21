@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { timeEntries, projects } from "@/db/schema";
+import { timeEntries, projects, claudeSessions, claudeEvents } from "@/db/schema";
 import { getUserFromRequest } from "@/lib/auth";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
@@ -79,9 +79,48 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const aiWorkingSeconds = await calculateAiWorkingTime(user.id, from, to);
+
   return NextResponse.json({
     totalSeconds,
     byProject: Array.from(projectMap.values()).sort((a, b) => b.totalSeconds - a.totalSeconds),
     bySource,
+    aiWorkingSeconds,
   });
+}
+
+async function calculateAiWorkingTime(userId: string, from: Date, to: Date): Promise<number> {
+  const sessions = await db
+    .select({ id: claudeSessions.id })
+    .from(claudeSessions)
+    .where(
+      and(
+        eq(claudeSessions.userId, userId),
+        gte(claudeSessions.startedAt, from),
+        lte(claudeSessions.startedAt, to)
+      )
+    );
+
+  if (sessions.length === 0) return 0;
+
+  let totalMs = 0;
+
+  for (const session of sessions) {
+    const events = await db
+      .select({ eventType: claudeEvents.eventType, timestamp: claudeEvents.timestamp })
+      .from(claudeEvents)
+      .where(eq(claudeEvents.sessionId, session.id))
+      .orderBy(claudeEvents.timestamp);
+
+    for (let i = 0; i < events.length; i++) {
+      if (events[i].eventType === "UserPromptSubmit") {
+        const next = events[i + 1];
+        if (next && next.eventType === "Stop") {
+          totalMs += new Date(next.timestamp).getTime() - new Date(events[i].timestamp).getTime();
+        }
+      }
+    }
+  }
+
+  return Math.floor(totalMs / 1000);
 }

@@ -16,7 +16,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Download, Trash2 } from "lucide-react";
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
-import type { EntryResponse } from "@/lib/api-client";
+import type { EntryResponse, StatsSummary } from "@/lib/api-client";
 
 type Period = "today" | "week" | "month";
 
@@ -38,6 +38,12 @@ export default function ReportsPage() {
 
   const { data: entries, refetch } = useApi<EntryResponse[]>(
     () => api.entries.list(range.from.toISOString(), range.to.toISOString()),
+    [period]
+  );
+
+  const periodMap: Record<Period, string> = { today: "today", week: "week", month: "month" };
+  const { data: stats } = useApi<StatsSummary>(
+    () => api.stats.summary(periodMap[period]),
     [period]
   );
 
@@ -122,10 +128,10 @@ export default function ReportsPage() {
       </div>
 
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Total</p>
+              <p className="text-sm text-muted-foreground">Your Time</p>
               <p className="text-2xl font-bold font-mono">{formatHours(summary.totalSeconds)}</p>
             </CardContent>
           </Card>
@@ -139,6 +145,12 @@ export default function ReportsPage() {
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">AI-Assisted</p>
               <p className="text-2xl font-bold font-mono text-emerald-500">{formatHours(summary.claudeSeconds)}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">AI Working</p>
+              <p className="text-2xl font-bold font-mono text-purple-400">{formatHours(stats?.aiWorkingSeconds ?? 0)}</p>
             </CardContent>
           </Card>
           <Card>

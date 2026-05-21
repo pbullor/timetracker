@@ -14,6 +14,7 @@ export function DaySummary({ stats }: DaySummaryProps) {
   const total = stats.totalSeconds;
   const manualPct = total > 0 ? (stats.bySource.manual / total) * 100 : 0;
   const claudePct = total > 0 ? (stats.bySource.claude_code / total) * 100 : 0;
+  const aiWorking = stats.aiWorkingSeconds;
 
   return (
     <Card>
@@ -21,12 +22,40 @@ export function DaySummary({ stats }: DaySummaryProps) {
         <CardTitle className="text-base">Today</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <p className="text-3xl font-bold font-mono tabular-nums">
-            {formatHours(total)}
-          </p>
-          <p className="text-sm text-muted-foreground">total tracked</p>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-3xl font-bold font-mono tabular-nums">
+              {formatHours(total)}
+            </p>
+            <p className="text-sm text-muted-foreground">total tracked</p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold font-mono tabular-nums text-purple-400">
+              {formatHours(aiWorking)}
+            </p>
+            <p className="text-sm text-muted-foreground">AI working time</p>
+          </div>
+          {total > 0 && aiWorking > 0 && (
+            <div>
+              <p className="text-3xl font-bold font-mono tabular-nums text-amber-400">
+                {formatHours(total + aiWorking)}
+              </p>
+              <p className="text-sm text-muted-foreground">effective output</p>
+            </div>
+          )}
         </div>
+
+        {aiWorking > 0 && (
+          <div className="rounded-lg bg-purple-500/10 border border-purple-500/20 px-3 py-2">
+            <p className="text-sm text-purple-300">
+              Claude worked <span className="font-semibold">{formatHours(aiWorking)}</span> autonomously while you invested <span className="font-semibold">{formatHours(total)}</span> — a{" "}
+              <span className="font-semibold">
+                {total > 0 ? `${Math.round(((total + aiWorking) / total) * 100)}%` : "—"}
+              </span>{" "}
+              productivity multiplier.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-2">
           <p className="text-sm font-medium">By source</p>
