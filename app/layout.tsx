@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/lib/auth-config";
 import { Navbar } from "@/components/navbar";
+import { PublicHeader } from "@/components/public-header";
+import { headers } from "next/headers";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -26,6 +28,10 @@ export default async function RootLayout({
     // Auth not configured yet
   }
 
+  const headerList = await headers();
+  const pathname = headerList.get("x-pathname") ?? "";
+  const isLandingOrLogin = pathname === "/" || pathname === "/login";
+
   return (
     <html lang="en" className={`${inter.variable} dark h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
@@ -36,8 +42,15 @@ export default async function RootLayout({
               {children}
             </main>
           </>
-        ) : (
+        ) : isLandingOrLogin ? (
           <>{children}</>
+        ) : (
+          <>
+            <PublicHeader />
+            <main className="flex-1">
+              {children}
+            </main>
+          </>
         )}
       </body>
     </html>
