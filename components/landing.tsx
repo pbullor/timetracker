@@ -14,6 +14,7 @@ import {
   Bot,
   TrendingUp,
   Globe,
+  Check,
 } from "lucide-react";
 
 type Lang = "en" | "es";
@@ -26,7 +27,7 @@ const t = {
       titleAccent: "And how much AI saves you.",
       subtitle:
         "TimeTracker automatically logs your Claude Code sessions alongside manual timers. See real hours vs AI-assisted hours per project — the metric that matters.",
-      cta: "Get Started Free",
+      cta: "Start Free Trial",
       ctaSecondary: "See how it works",
     },
     features: {
@@ -82,9 +83,35 @@ const t = {
         { label: "Multiplier", value: "143%", color: "text-emerald-400" },
       ],
     },
+    pricing: {
+      title: "Simple pricing. No surprises.",
+      subtitle: "Start with a 7-day free trial. No credit card required.",
+      viewAll: "See all plans",
+      plans: [
+        {
+          name: "Starter",
+          price: "$3",
+          period: "/mo",
+          features: ["1 user", "3 projects", "Claude Code auto-tracking", "7-day reports"],
+        },
+        {
+          name: "Pro",
+          price: "$9",
+          period: "/mo",
+          features: ["Unlimited projects", "AI working time metrics", "Productivity multiplier", "CSV export", "Full history"],
+          popular: true,
+        },
+        {
+          name: "Team",
+          price: "$14",
+          period: "/user/mo",
+          features: ["Everything in Pro", "Team members", "Team reports", "Per-member CWD", "Priority support"],
+        },
+      ],
+    },
     cta: {
       title: "Stop guessing. Start measuring.",
-      subtitle: "Free for individual developers. Set up in under 3 minutes.",
+      subtitle: "7-day free trial. Set up in under 3 minutes.",
       button: "Start Tracking",
     },
     footer: "Built with Next.js, Drizzle, and Neon. Open source.",
@@ -97,7 +124,7 @@ const t = {
       titleAccent: "Y cuanto te ahorra la IA.",
       subtitle:
         "TimeTracker loguea tus sesiones de Claude Code automaticamente junto con timers manuales. Ve horas reales vs horas asistidas por IA por proyecto — la metrica que importa.",
-      cta: "Empezar Gratis",
+      cta: "Probar Gratis 7 Dias",
       ctaSecondary: "Ver como funciona",
     },
     features: {
@@ -153,9 +180,35 @@ const t = {
         { label: "Multiplicador", value: "143%", color: "text-emerald-400" },
       ],
     },
+    pricing: {
+      title: "Pricing simple. Sin sorpresas.",
+      subtitle: "Empeza con 7 dias de prueba gratis. Sin tarjeta de credito.",
+      viewAll: "Ver todos los planes",
+      plans: [
+        {
+          name: "Starter",
+          price: "$3",
+          period: "/mes",
+          features: ["1 usuario", "3 proyectos", "Auto-tracking Claude Code", "Reportes 7 dias"],
+        },
+        {
+          name: "Pro",
+          price: "$9",
+          period: "/mes",
+          features: ["Proyectos ilimitados", "Metricas de IA", "Multiplicador productividad", "Export CSV", "Historial completo"],
+          popular: true,
+        },
+        {
+          name: "Team",
+          price: "$14",
+          period: "/usuario/mes",
+          features: ["Todo de Pro", "Miembros de equipo", "Reportes de equipo", "CWD por miembro", "Soporte prioritario"],
+        },
+      ],
+    },
     cta: {
       title: "Deja de adivinar. Empeza a medir.",
-      subtitle: "Gratis para developers individuales. Setup en menos de 3 minutos.",
+      subtitle: "7 dias de prueba gratis. Setup en menos de 3 minutos.",
       button: "Empezar a Trackear",
     },
     footer: "Hecho con Next.js, Drizzle y Neon. Open source.",
@@ -307,6 +360,57 @@ export function Landing() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="mx-auto max-w-5xl px-4 py-20">
+        <h2 className="text-3xl font-bold text-center mb-2">{c.pricing.title}</h2>
+        <p className="text-center text-muted-foreground mb-12">{c.pricing.subtitle}</p>
+        <div className="grid sm:grid-cols-3 gap-6">
+          {c.pricing.plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`rounded-xl border p-6 bg-card ${
+                "popular" in plan && plan.popular
+                  ? "border-2 border-primary relative"
+                  : "border-border/50"
+              }`}
+            >
+              {"popular" in plan && plan.popular && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
+                  Popular
+                </span>
+              )}
+              <h3 className="font-semibold text-lg">{plan.name}</h3>
+              <div className="mt-3 mb-4">
+                <span className="text-4xl font-bold">{plan.price}</span>
+                <span className="text-muted-foreground ml-1">{plan.period}</span>
+              </div>
+              <ul className="space-y-2 mb-6">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/pricing">
+                <Button
+                  className="w-full"
+                  variant={"popular" in plan && plan.popular ? "default" : "outline"}
+                >
+                  {c.hero.cta}
+                  <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          ))}
+        </div>
+        <p className="text-center mt-6">
+          <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4">
+            {c.pricing.viewAll} →
+          </Link>
+        </p>
       </section>
 
       {/* Final CTA */}
