@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/lib/auth-config";
-import { redirect } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 
 const inter = Inter({
@@ -12,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "TimeTracker — Dev Time Tracking",
-  description: "Track your development time with AI-assisted insights",
+  description: "Track your development time with AI-assisted insights. Measure manual hours vs AI-assisted hours per project.",
 };
 
 export default async function RootLayout({
@@ -21,7 +20,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  const isLoginPage = false; // handled by login page itself
 
   return (
     <html lang="en" className={`${inter.variable} dark h-full antialiased`}>
@@ -34,9 +32,7 @@ export default async function RootLayout({
             </main>
           </>
         ) : (
-          <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-8">
-            {children}
-          </main>
+          <>{children}</>
         )}
       </body>
     </html>
