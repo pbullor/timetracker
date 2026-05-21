@@ -1,0 +1,38 @@
+# Multick — AI Dev Time Tracking
+
+> Multick is a SaaS time tracker built for developers who use AI coding assistants like Claude Code. It automatically tracks AI-assisted coding sessions alongside manual timers, showing the real productivity multiplier of using AI.
+
+## What it does
+
+- **Manual time tracking**: Start/stop timers per project from a clean web dashboard.
+- **Automatic Claude Code tracking**: Bash hooks capture session events (start, prompts, stops, end) and send them to the Multick API. No browser extension or desktop app needed.
+- **AI working time**: Measures how long Claude Code spends processing (between prompt submission and response), separate from the developer's active time.
+- **Productivity multiplier**: Shows effective output hours (your time + AI working time) vs your invested time. Example: you work 4h, AI works 1.8h, effective output = 5.8h, multiplier = 145%.
+- **Team support**: Invite teammates to projects, each with their own local directory patterns for auto-matching sessions.
+- **Reports & CSV export**: Filter by day, week, or month. Breakdown by project and source. Export for invoicing.
+
+## Who it's for
+
+- Individual developers using Claude Code who want to quantify their AI ROI
+- Dev teams measuring how AI tools impact productivity
+- Freelancers who need to track and invoice AI-assisted development hours
+
+## Pricing
+
+- Starter: $3/month (1 user, 3 projects, 7-day reports)
+- Pro: $9/month (unlimited projects, full history, CSV export)
+- Team: $14/user/month (team reports, shared dashboards, priority support)
+- All plans include a 7-day free trial
+
+## Tech stack
+
+- Next.js, TypeScript, Tailwind CSS
+- Drizzle ORM + Neon Postgres
+- Auth.js (Google + GitHub OAuth)
+- Stripe billing
+- Claude Code hooks (bash scripts)
+
+## Links
+
+- Website: https://multick.dev
+- Pricing: https://multick.dev/pricing
