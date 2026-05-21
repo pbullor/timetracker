@@ -30,9 +30,11 @@ const PLAN_LABELS: Record<string, { label: string; color: string }> = {
 function BillingSection() {
   const { data, loading } = useApi<{
     plan: string;
+    planStatus: string;
     stripeCustomerId: string | null;
     stripeSubscriptionId: string | null;
     planExpiresAt: string | null;
+    trialEndsAt: string | null;
   }>(() => fetch("/api/settings/billing").then((r) => r.json()), []);
 
   const [portalLoading, setPortalLoading] = useState(false);
@@ -51,7 +53,13 @@ function BillingSection() {
   const plan = data?.plan ?? "free";
   const planInfo = PLAN_LABELS[plan] ?? PLAN_LABELS.free;
   const hasSubscription = !!data?.stripeSubscriptionId;
+  const isTrial = data?.planStatus === "trialing";
+  const trialEndsAt = data?.trialEndsAt ? new Date(data.trialEndsAt) : null;
   const expiresAt = data?.planExpiresAt ? new Date(data.planExpiresAt) : null;
+
+  const trialDaysLeft = trialEndsAt
+    ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   return (
     <Card>
@@ -73,8 +81,20 @@ function BillingSection() {
                   <Badge variant="secondary" className={planInfo.color}>
                     {planInfo.label}
                   </Badge>
+                  {isTrial && (
+                    <Badge variant="secondary" className="bg-amber-500/10 text-amber-500">
+                      Trial
+                    </Badge>
+                  )}
                 </div>
-                {hasSubscription && expiresAt && (
+                {isTrial && trialEndsAt && (
+                  <p className="text-xs text-muted-foreground">
+                    {trialDaysLeft > 0
+                      ? `Trial ends in ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} (${trialEndsAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })})`
+                      : "Trial ends today"}
+                  </p>
+                )}
+                {hasSubscription && !isTrial && expiresAt && (
                   <p className="text-xs text-muted-foreground">
                     Renews {expiresAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                   </p>

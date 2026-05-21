@@ -6,9 +6,11 @@ export async function GET() {
     const user = await requireUser();
     return NextResponse.json({
       plan: user.plan,
+      planStatus: user.planStatus,
       stripeCustomerId: user.stripeCustomerId,
       stripeSubscriptionId: user.stripeSubscriptionId,
       planExpiresAt: user.planExpiresAt,
+      trialEndsAt: user.trialEndsAt,
     });
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

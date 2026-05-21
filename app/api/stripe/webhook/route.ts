@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
           .update(users)
           .set({
             plan,
+            planStatus: "trialing",
             stripeSubscriptionId: session.subscription as string,
           })
           .where(eq(users.id, userId));
@@ -51,12 +52,17 @@ export async function POST(request: NextRequest) {
       const periodEnd = item?.current_period_end;
 
       if (status === "active" || status === "trialing") {
+        const trialEnd = subscription.trial_end;
         await db
           .update(users)
           .set({
             ...planMap,
+            planStatus: status,
             planExpiresAt: periodEnd
               ? new Date(periodEnd * 1000)
+              : null,
+            trialEndsAt: trialEnd
+              ? new Date(trialEnd * 1000)
               : null,
           })
           .where(eq(users.stripeCustomerId, customerId));
@@ -71,8 +77,10 @@ export async function POST(request: NextRequest) {
         .update(users)
         .set({
           plan: "free",
+          planStatus: "none",
           stripeSubscriptionId: null,
           planExpiresAt: null,
+          trialEndsAt: null,
         })
         .where(eq(users.stripeCustomerId, customerId));
       break;
