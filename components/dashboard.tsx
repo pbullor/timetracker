@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { TimerCard } from "@/components/timer-card";
 import { DaySummary } from "@/components/day-summary";
 import { api } from "@/lib/api-client";
@@ -19,6 +20,16 @@ export function Dashboard() {
     () => api.stats.summary("today"),
     []
   );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetchTimer();
+      refetchStats();
+    }, 30000);
+    const onFocus = () => { refetchTimer(); refetchStats(); };
+    window.addEventListener("focus", onFocus);
+    return () => { clearInterval(interval); window.removeEventListener("focus", onFocus); };
+  }, [refetchTimer, refetchStats]);
 
   async function handleStart(projectId: string) {
     await api.timer.start(projectId);
