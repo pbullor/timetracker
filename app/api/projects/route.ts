@@ -9,13 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireUserOrApiKey(request);
 
-    const owned = await db
-      .select()
-      .from(projects)
-      .where(and(eq(projects.ownerId, user.id), eq(projects.archived, false)))
-      .orderBy(projects.name);
-
-    const memberOf = await db
+    const allProjects = await db
       .select({
         id: projects.id,
         ownerId: projects.ownerId,
@@ -30,15 +24,10 @@ export async function GET(request: NextRequest) {
       })
       .from(projectMembers)
       .innerJoin(projects, eq(projectMembers.projectId, projects.id))
-      .where(and(eq(projectMembers.userId, user.id), eq(projects.archived, false)));
+      .where(and(eq(projectMembers.userId, user.id), eq(projects.archived, false)))
+      .orderBy(projects.name);
 
-    const ownedIds = new Set(owned.map((p) => p.id));
-    const merged = [
-      ...owned.map((p) => ({ ...p, role: "owner" as const, cwdPattern: null as string | null })),
-      ...memberOf.filter((p) => !ownedIds.has(p.id)),
-    ];
-
-    return NextResponse.json(merged);
+    return NextResponse.json(allProjects);
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

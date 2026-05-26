@@ -17,9 +17,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
 
+    const { cwdPattern, ...projectData } = parsed.data;
+
     const updated = await db
       .update(projects)
-      .set(parsed.data)
+      .set(projectData)
       .where(and(eq(projects.id, id), eq(projects.ownerId, user.id)))
       .returning();
 
@@ -27,7 +29,14 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Project not found or not owner" }, { status: 404 });
     }
 
-    return NextResponse.json(updated[0]);
+    if (cwdPattern !== undefined) {
+      await db
+        .update(projectMembers)
+        .set({ cwdPattern })
+        .where(and(eq(projectMembers.projectId, id), eq(projectMembers.userId, user.id)));
+    }
+
+    return NextResponse.json({ ...updated[0], cwdPattern: cwdPattern ?? null });
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
