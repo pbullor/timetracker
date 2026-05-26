@@ -55,6 +55,16 @@ export const metadata: Metadata = {
   alternates: {
     canonical: BASE_URL,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicon-180.png", sizes: "180x180" },
+    ],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default async function RootLayout({

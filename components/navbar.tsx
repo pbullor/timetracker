@@ -19,8 +19,8 @@ export function Navbar({ userName, userImage }: { userName?: string | null; user
     <header className="border-b border-border bg-card">
       <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-14">
         <div className="flex items-center gap-6">
-          <Link href="/" className="font-semibold text-lg tracking-tight">
-            Multick
+          <Link href="/">
+            <img src="/multick-lockup-dark.svg" alt="Multick" className="h-7" />
           </Link>
           <nav className="flex items-center gap-1">
             {links.map(({ href, label, icon: Icon }) => (

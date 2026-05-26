@@ -5,8 +5,8 @@ export function PublicHeader() {
   return (
     <header className="border-b border-border/50">
       <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-14">
-        <Link href="/" className="font-semibold text-lg tracking-tight">
-          Multick
+        <Link href="/">
+          <img src="/multick-lockup-dark.svg" alt="Multick" className="h-7" />
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/extension" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

@@ -225,7 +225,7 @@ export function Landing() {
       {/* Nav */}
       <header className="border-b border-border/50">
         <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-14">
-          <span className="font-semibold text-lg tracking-tight">Multick</span>
+          <img src="/multick-lockup-dark.svg" alt="Multick" className="h-7" />
           <div className="flex items-center gap-3">
             <Link href="/extension" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Extension

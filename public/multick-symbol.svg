@@ -1,0 +1,7 @@
+<svg width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="multick symbol">
+  <g transform="translate(8,14)">
+    <path d="M0 12 L17 31 L0 50" fill="none" stroke="#3FB950" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M34 35 L47 49 L75 16" fill="none" stroke="#E6EDF3" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="90" y="14" width="10" height="37" rx="1.5" fill="#3FB950"/>
+  </g>
+</svg>
