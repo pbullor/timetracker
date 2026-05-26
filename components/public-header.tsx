@@ -9,6 +9,12 @@ export function PublicHeader() {
           Multick
         </Link>
         <div className="flex items-center gap-3">
+          <Link href="/extension" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Extension
+          </Link>
+          <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Pricing
+          </Link>
           <Link href="/login">
             <Button variant="outline" size="sm">Log in</Button>
           </Link>

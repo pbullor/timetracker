@@ -227,6 +227,12 @@ export function Landing() {
         <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-14">
           <span className="font-semibold text-lg tracking-tight">Multick</span>
           <div className="flex items-center gap-3">
+            <Link href="/extension" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Extension
+            </Link>
+            <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Pricing
+            </Link>
             <button
               onClick={() => setLang(lang === "en" ? "es" : "en")}
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
