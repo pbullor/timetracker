@@ -1,13 +1,13 @@
 import { db } from "@/db";
 import { projects, projectMembers } from "@/db/schema";
-import { requireUser } from "@/lib/auth";
+import { requireUserOrApiKey } from "@/lib/auth";
 import { and, eq, or } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { createProjectSchema } from "@/lib/validators";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireUserOrApiKey(request);
 
     const owned = await db
       .select()
@@ -46,7 +46,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireUserOrApiKey(request);
     const body = await request.json();
     const parsed = createProjectSchema.safeParse(body);
     if (!parsed.success) {

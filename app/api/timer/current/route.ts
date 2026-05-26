@@ -1,12 +1,12 @@
 import { db } from "@/db";
 import { timeEntries, projects } from "@/db/schema";
-import { requireUser } from "@/lib/auth";
+import { requireUserOrApiKey } from "@/lib/auth";
 import { and, eq, isNull } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireUserOrApiKey(request);
 
     const running = await db
       .select({

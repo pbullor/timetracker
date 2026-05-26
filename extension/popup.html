@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0b;
+      color: #e4e4e7;
+      font-size: 13px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #27272a;
+    }
+    .header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+    .header a {
+      color: #71717a;
+      text-decoration: none;
+      font-size: 11px;
+    }
+    .header a:hover { color: #e4e4e7; }
+
+    /* Setup screen */
+    .setup {
+      padding: 24px 16px;
+    }
+    .setup p {
+      color: #a1a1aa;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .setup label {
+      display: block;
+      font-size: 11px;
+      color: #a1a1aa;
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+    .setup input {
+      width: 100%;
+      padding: 8px 10px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      color: #e4e4e7;
+      font-size: 13px;
+      font-family: ui-monospace, monospace;
+      outline: none;
+    }
+    .setup input:focus { border-color: #3b82f6; }
+
+    /* Buttons */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+
+    /* Timer view */
+    .running {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid #27272a;
+    }
+    .running .project-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .running .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .running .time {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Project list */
+    .projects {
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .project-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid #27272a;
+      transition: background 0.1s;
+    }
+    .project-item:hover { background: #18181b; }
+    .project-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .project-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .play-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #27272a;
+      background: transparent;
+      color: #e4e4e7;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .play-btn:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+    .play-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .empty {
+      padding: 24px 16px;
+      text-align: center;
+      color: #71717a;
+    }
+
+    .loading {
+      padding: 32px 16px;
+      text-align: center;
+      color: #71717a;
+    }
+
+    .error {
+      padding: 12px 16px;
+      color: #f87171;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .footer {
+      padding: 8px 16px;
+      border-top: 1px solid #27272a;
+      text-align: center;
+    }
+    .footer button {
+      background: none;
+      border: none;
+      color: #71717a;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .footer button:hover { color: #e4e4e7; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Multick</h1>
+    <a href="https://multick.dev" target="_blank">Open app ↗</a>
+  </div>
+
+  <div id="app">
+    <div class="loading">Loading...</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

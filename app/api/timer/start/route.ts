@@ -1,13 +1,13 @@
 import { db } from "@/db";
 import { timeEntries, projects, projectMembers } from "@/db/schema";
-import { requireUser } from "@/lib/auth";
+import { requireUserOrApiKey } from "@/lib/auth";
 import { startTimerSchema } from "@/lib/validators";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireUserOrApiKey(request);
     const body = await request.json();
     const parsed = startTimerSchema.safeParse(body);
     if (!parsed.success) {

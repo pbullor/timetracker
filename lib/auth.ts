@@ -31,3 +31,13 @@ export async function getUserByApiKey(apiKey: string) {
 
   return rows[0] ?? null;
 }
+
+export async function requireUserOrApiKey(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const apiKey = authHeader.slice(7);
+    const user = await getUserByApiKey(apiKey);
+    if (user) return user;
+  }
+  return requireUser();
+}
