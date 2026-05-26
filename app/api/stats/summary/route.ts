@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(timeEntries.userId, user.id),
-          gte(timeEntries.startAt, from),
-          lte(timeEntries.startAt, to)
+          lte(timeEntries.startAt, to),
+          gte(timeEntries.endAt, from)
         )
       );
 
@@ -97,8 +97,8 @@ async function calculateAiWorkingTime(userId: string, from: Date, to: Date): Pro
     .where(
       and(
         eq(claudeSessions.userId, userId),
-        gte(claudeSessions.startedAt, from),
-        lte(claudeSessions.startedAt, to)
+        lte(claudeSessions.startedAt, to),
+        gte(claudeSessions.lastActivityAt, from)
       )
     );
 
