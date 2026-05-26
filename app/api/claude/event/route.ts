@@ -83,6 +83,18 @@ export async function POST(request: NextRequest) {
   }
 
   if (event_type === "Stop" || event_type === "SessionEnd") {
+    let projectId = currentSession.projectId;
+    if (!projectId) {
+      const matchedProject = await findProjectByCwd(user.id, cwd);
+      if (matchedProject) {
+        projectId = matchedProject.id;
+        await db
+          .update(claudeSessions)
+          .set({ projectId })
+          .where(eq(claudeSessions.id, currentSession.id));
+      }
+    }
+
     await db
       .update(claudeSessions)
       .set({ endedAt: eventTime })
@@ -90,26 +102,56 @@ export async function POST(request: NextRequest) {
 
     await insertEvent(external_session_id, event_type, eventTime, metadata ?? null);
 
-    if (currentSession.projectId) {
+    if (projectId) {
       const idleMs = await calculateIdleTime(currentSession.id);
       const totalMs = eventTime.getTime() - new Date(currentSession.startedAt).getTime();
       const activeMs = Math.max(totalMs - idleMs, 0);
       const activeEnd = new Date(new Date(currentSession.startedAt).getTime() + activeMs);
+      const promptCount = currentSession.promptCount;
 
-      await db.insert(timeEntries).values({
-        projectId: currentSession.projectId,
-        userId: user.id,
-        startAt: currentSession.startedAt,
-        endAt: activeEnd,
-        source: "claude_code",
-        note: `Claude Code session (${currentSession.promptCount} prompts)`,
-        metadata: {
-          claudeSessionId: currentSession.id,
-          externalSessionId: external_session_id,
-          idleSeconds: Math.floor(idleMs / 1000),
-          totalSeconds: Math.floor(totalMs / 1000),
-        },
-      });
+      const existingEntry = await db
+        .select({ id: timeEntries.id })
+        .from(timeEntries)
+        .where(
+          and(
+            eq(timeEntries.source, "claude_code"),
+            eq(timeEntries.userId, user.id),
+            eq(timeEntries.projectId, projectId),
+            eq(timeEntries.startAt, currentSession.startedAt)
+          )
+        )
+        .limit(1);
+
+      if (existingEntry.length === 0) {
+        await db.insert(timeEntries).values({
+          projectId,
+          userId: user.id,
+          startAt: currentSession.startedAt,
+          endAt: activeEnd,
+          source: "claude_code",
+          note: `Claude Code session (${promptCount} prompts)`,
+          metadata: {
+            claudeSessionId: currentSession.id,
+            externalSessionId: external_session_id,
+            idleSeconds: Math.floor(idleMs / 1000),
+            totalSeconds: Math.floor(totalMs / 1000),
+          },
+        });
+      } else {
+        await db
+          .update(timeEntries)
+          .set({
+            endAt: activeEnd,
+            note: `Claude Code session (${promptCount} prompts)`,
+            metadata: {
+              claudeSessionId: currentSession.id,
+              externalSessionId: external_session_id,
+              idleSeconds: Math.floor(idleMs / 1000),
+              totalSeconds: Math.floor(totalMs / 1000),
+            },
+          })
+          .where(eq(timeEntries.id, existingEntry[0].id));
+      }
     }
 
     return NextResponse.json({ ok: true });
