@@ -3,7 +3,7 @@
   "name": "Multick — AI Dev Time Tracker",
   "version": "1.0.0",
   "description": "Start and stop project timers from your browser. Track your dev time without leaving your tab.",
-  "permissions": ["storage", "alarms"],
+  "permissions": ["storage"],
   "host_permissions": ["https://multick.dev/*"],
   "action": {
     "default_popup": "popup.html",
